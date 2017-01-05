@@ -1,0 +1,81 @@
+chassagne:
+  image: chassagne/chassagne:${CHASSAGNE_VERSION}
+  labels:
+    traefik.frontend.rule: 'HostRegexp:{subdomain:${HOST_TO_CHANGE}|${HOST_TO_CHANGE}-front}.${RANCHER_INSTANCE}.generixgroup.com'
+    traefik.frontend.passHostHeader: 'true'
+    traefik.port: '8080'
+  environment:
+    DB_GENERATE_MODE: '${DB_GENERATE_MODE}'
+    HOST_TO_CHANGE: '${HOST_TO_CHANGE}'
+    RANCHER_INSTANCE: '${RANCHER_INSTANCE}'
+    MONGO_URL: 'nosql:27017'
+    DB_TYPE: 'mysql'
+    DB_URL: 'jdbc:mysql://db:3306/gnx?useSSL=false'
+    DB_DRIVER: 'com.mysql.jdbc.Driver'
+    DB_USERNAME: 'gnx'
+    DB_PASSWORD: 'CH4SS4GN3!'
+    DB_JDBC_DIALECT: 'com.byzaneo.commons.dao.hibernate.support.MySQL5Dialect'
+    SMTP_HOST: 'maildev'
+    SMTP_PORT: '1025'
+    AUDIT_ENABLED: 'false'
+    ROUTING_ENABLED: 'false'
+    BROKER_HOST: ''
+  links:
+  - mongo:nosql
+  - mysql:db
+  external_links:
+  - 'common/maildev:'
+  volumes:
+  - ${DIRECTORY_TO_CHANGE}/datadir:/var/gnx
+  log_opt:
+    max-size: '50m'
+  restart: 'no'
+  cpu_shares: 512
+  mem_limit: 2147483648
+mysql:
+  image: mysql:5.7
+  labels:
+    traefik.enable: 'false'
+  environment:
+    MYSQL_ROOT_PASSWORD: 's3cr3t!'
+    MYSQL_DATABASE: 'gnx'
+    MYSQL_USER: 'gnx'
+    MYSQL_PASSWORD: 'CH4SS4GN3!'
+  volumes:
+  - ${DIRECTORY_TO_CHANGE}/mysql:/var/lib/mysql
+  log_opt:
+    max-size: '50m'
+  restart: 'no'
+  cpu_shares: 512
+  mem_limit: 536870912
+mongo:
+  image: mongo:3.2
+  command:
+  - mongod
+  - --smallfiles
+  labels:
+    traefik.enable: 'false'
+  volumes:
+  - ${DIRECTORY_TO_CHANGE}/mongo:/data/db
+  log_opt:
+    max-size: '50m'
+  restart: 'no'
+  cpu_shares: 512
+  mem_limit: 536870912
+file:
+  image: generix/file-manager:latest
+  labels:
+    traefik.frontend.rule: 'Host'
+    traefik.frontend.value: '${HOST_TO_CHANGE}-file.${RANCHER_INSTANCE}.generixgroup.com'
+    traefik.port: '1080'
+    traefik.frontend.passHostHeader: 'true'
+  environment:
+    STACK_NAME: '${HOST_TO_CHANGE}'
+  volumes:
+  - ${DIRECTORY_TO_CHANGE}/datadir:/var/www/localhost/datadir
+  - ${DIRECTORY_TO_CHANGE}:/var/backup
+  log_opt:
+    max-size: '50m'
+  restart: 'no'
+  cpu_shares: 256
+  mem_limit: 268435456

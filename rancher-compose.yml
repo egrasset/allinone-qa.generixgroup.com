@@ -1,0 +1,39 @@
+.catalog:
+  name: 'Chassagne minimal'
+  version: latest
+  uuid: chassagne-min-91
+  labels:
+     io.rancher.container.pull_image: always
+  questions:
+    - variable: HOST_TO_CHANGE
+      description: 'Nom du sous-domaine souhaite'
+      label: 'Sous-domaine :'
+      required: true
+      default: demo
+      type: string
+    - variable: RANCHER_INSTANCE
+      description: 'Machine sur laquelle la stack doit etre deployee'
+      label: 'Machine :'
+      required: true
+      default: allinone-qa
+      type: string
+    - variable: DIRECTORY_TO_CHANGE
+      description: 'Emplacement souhaite sur le serveur'
+      label: 'Repertoire :'
+      required: true
+      default: /data/chassagne/demo
+      type: string
+    - variable: CHASSAGNE_VERSION
+      description: 'Version de l image souhaitee'
+      label: 'Version applicative :'
+      required: true
+      default: latest
+      type: string
+    - variable: DB_GENERATE_MODE
+      description: 'Mode de demarrage'
+      label: 'Generate mode :'
+      required: true
+      type: enum
+      options:
+        - update
+        - create
